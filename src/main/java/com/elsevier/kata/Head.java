@@ -6,7 +6,7 @@ import java.io.IOException;
 
 class Head {
     private static final int ERR_EXIT = 1;
-    private static final int MAX_CHARS = 400;
+    private static final int MAX_CHARS = 512;
     private static final int NUM_LINES = 10;
     private static final char RETURN_CHAR = '\n';
 
