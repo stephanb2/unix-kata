@@ -3,6 +3,7 @@ package com.elsevier.kata;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 
 class Head {
     private static final int ERR_EXIT = 1;
@@ -16,42 +17,36 @@ class Head {
             printer = new PrintHeadDecorator(printer);
         }
 
-        try {
-            for (String fileName : args) {
-                System.out.println(printer.getHead(fileName, NUM_LINES));
+        for (String fileName : args) {
+            try (Reader fileReader = new FileReader(fileName)) {
+                printer.getHead(fileReader, fileName, NUM_LINES);
+            } catch (Exception e) {
+                System.err.println(e);
+                System.exit(ERR_EXIT);
             }
-        } catch (Exception e) {
-            System.err.println(e);
-            System.exit(ERR_EXIT);
         }
+
     }
 
     private static interface PrintHead {
-        String getHead(String fileName, int maxLines) throws IOException;
+        void getHead(Reader reader, String fileName, int maxLines) throws IOException;
     }
 
     private static class SimplePrintHead implements PrintHead {
 
         @Override
-        public String getHead(String fileName, int maxLines) throws IOException {
-            FileReader fileReader = new FileReader(fileName);
-            BufferedReader reader = new BufferedReader(fileReader);
-            StringBuilder output = new StringBuilder();
-            int charCount = 0;
+        public void getHead(Reader reader, String fileName, int maxLines) throws IOException {
+            BufferedReader br = new BufferedReader(reader);
             int lineCount = 0;
-            int charAsInt;
+            int charByte;
 
-            while ((charAsInt = reader.read()) != -1 && lineCount < maxLines && charCount < MAX_CHARS) {
-                charCount += 1;
-                char currentChar = (char) charAsInt;
-                output.append(currentChar);
-                if (currentChar == RETURN_CHAR) {
+            while ((charByte = br.read()) != -1 && lineCount < maxLines) {
+                if ((char) charByte == RETURN_CHAR) {
                     lineCount += 1;
-                    charCount = 0;
                 }
+                System.out.write(charByte);
             }
-            fileReader.close();
-            return output.toString();
+            System.out.flush();
         }
     }
 
@@ -64,15 +59,13 @@ class Head {
         }
 
         @Override
-        public String getHead(String fileName, int maxLines) throws IOException {
-            StringBuilder output = new StringBuilder();
+        public void getHead(Reader reader, String fileName, int maxLines) throws IOException {
             if (callCount != 0) {
-                output.append("\n");
+                System.out.println("");
             }
-            output.append("==> ").append(fileName).append(" <==\n");
-            output.append(decoratedPrintHead.getHead(fileName, maxLines));
+            System.out.println("==> " + fileName + " <==");
+            decoratedPrintHead.getHead(reader, fileName, maxLines);
             callCount += 1;
-            return output.toString();
         }
     }
 }

@@ -3,10 +3,12 @@ package com.elsevier.kata;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.*;
-
-import static org.junit.Assert.*;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 
 public class TextUtilsTest {
 
@@ -23,11 +25,13 @@ public class TextUtilsTest {
     @Test
     public void simpleStringIsText() throws IOException {
         //Given
-        StringReader stringReader = new StringReader("There are many variations of passages of Lorem Ipsum available, " +
-                "but the majority have suffered alteration in some form, by injected humour, or randomised words " +
-                "which don't look even slightly believable.");
+        StringReader stringReader = new StringReader(
+                "There are many variations of passages of Lorem Ipsum available, " +
+                        "but the majority have suffered alteration in some form, by injected humour, or randomised words "
+                        +
+                        "which don't look even slightly believable.");
         // When
-        Boolean isText = TextUtils.isText(stringReader);
+        boolean isText = TextUtils.isText(stringReader);
         //Then
         Assert.assertTrue(isText);
         char[] buffer = new char[10];
